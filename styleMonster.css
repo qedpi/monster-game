@@ -1,0 +1,25 @@
+.card {
+    width: 40rem;
+}
+
+.healthbar {
+    height: 3em;
+    width: 80%;
+    background-color: darkred;
+     /* border: solid black .3em; */
+    transition: width 500ms;
+}
+
+.health {
+    background-color: red;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 45% 45%;
+    grid-column-gap: 10%;
+}
+
+.center {
+    margin: auto;
+}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="styleMonster.css">
+</head>
+<body>
+<div id="app">
+
+    <div class="wrapper">
+        <template v-for = "val, name in healthbars">
+            <div class="hero">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <p class="display-1">{{name}}</p>
+                    </div>
+                </div>
+                <div class="healthbar" style="background-color: lightgray">
+                    <div :style = "{width: val + '%'}" class="healthbar">
+                        <p class="text-white text-center">{{val}}</p>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+    <hr>
+    <div class="row">
+        <div v-if = "game_started" class="center">
+            <button @click = "attack('a')" class="btn btn-danger">Attack</button>
+            <button @click = "attack('s')" class="btn btn-warning">Special Attack</button>
+            <button @click = "attack('h')" class="btn btn-success">Heal</button>
+            <button @click = "game_started = false" class="btn btn-secondary">Surrender</button>
+        </div>
+        <div v-else class="center">
+            <button @click = "start_game" class="btn btn-success">Start Game</button>
+        </div>
+    </div>
+    <br><br>
+
+    <div class="history container">
+        <div v-for = "line, i of history.slice().reverse().slice(0, history_limit)" class="">
+            <p :style = "{'background-color': (i % 2? 'blue' : 'red')}" class="text-white">{{line}}</p>
+        </div>
+        <div v-if = "history.length > history_limit">
+            <p class="text-center">o o o</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            msg: 'hello',
+            hero_health: 100,
+            monster_health: 100,
+            game_started: false,
+            player_name: "Player",
+            monster_name: "Monster",
+            history: [],
+            history_limit: 8,
+        },
+        methods: {
+            rand(a, b){
+                return parseInt(Math.random() * (b - a + 1)) + a;
+            },
+            attack(option){
+                let amount = 0;
+                if (option === 'a'){
+                    amount = this.rand(5, 10);
+                    this.monster_health -= amount;
+                    this.history.push(`${this.player_name} hits ${this.monster_name} for ${amount}`);
+                } else if (option === 's'){
+                    amount = this.rand(5, 20);
+                    this.monster_health -= amount;
+                    this.history.push(`${this.player_name} hits ${this.monster_name} for ${amount}`);
+                } else if (option === 'h'){
+                    amount = this.rand(5, 15);
+                    this.hero_health += amount;
+                    this.history.push(`${this.player_name} heals for ${amount}`);
+                }
+                const damage_taken = this.rand(5, 10);
+                this.hero_health -= damage_taken;
+                this.history.push(`${this.monster_name} hits ${this.player_name} for ${damage_taken}`);
+
+                if (this.monster_health < 0){
+                    if (confirm('you win! start new game?')){
+                        this.start_game();
+                    } else {
+                        this.game_started = false;
+                    }
+                } else if (this.hero_health < 0){
+                    if (confirm('you lost! start new game?')){
+                        this.start_game();
+                    } else {
+                        this.game_started = false;
+                    }
+                }
+            },
+            start_game(){
+                this.hero_health = this.monster_health = 100;
+                this.game_started = true;
+                this.history = [];
+            },
+        },
+        computed: {
+            healthbars(){
+                return {'hero': this.hero_health, 'monster': this.monster_health};
+            },
+        }
+    });
+</script>
